@@ -1,3 +1,9 @@
+## Identificação da equipe
+
+- Igor Gomes Ximenes - 2217665  
+- Gabriel Abreu Cunha de Alencar - 2315097
+- Kalil Smith Pinto Palheta - 2223857
+  
 # Simulador de Busca em Redes P2P
 
 Projeto em Python para simular buscas por recursos em redes P2P não estruturadas.
@@ -129,11 +135,3 @@ edges:
 
 Os nós são identificados automaticamente como `n1`, `n2`, ..., `nN`, de acordo com `num_nodes`.
 
-## Identificação da equipe
-
-Preencha antes de entregar:
-
-- Nome 1:
-- Nome 2:
-- Nome 3:
-- Nome 4:
