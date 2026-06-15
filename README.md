@@ -10,6 +10,8 @@ Projeto em Python para simular buscas por recursos em redes P2P não estruturada
 
 O foco da demonstração é permitir que o professor escolha, ao vivo, um nó de origem e um recurso. O sistema mostra visualmente o algoritmo funcionando passo a passo, com quantidade de mensagens, nós buscados, caminho de retorno e comparação de mínimo/máximo por algoritmo.
 
+Relatório completo do funcionamento e atendimento aos requisitos: [RELATORIO.md](RELATORIO.md).
+
 ## Funcionalidades
 
 - Leitura de topologias em YAML ou JSON.
