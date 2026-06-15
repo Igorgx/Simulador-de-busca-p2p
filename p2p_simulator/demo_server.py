@@ -467,7 +467,11 @@ DEMO_HTML = r"""<!doctype html>
     .node text {
       text-anchor: middle;
       dominant-baseline: middle;
-      fill: #020617;
+      fill: #000000 !important;
+      stroke: #ffffff;
+      stroke-opacity: 0.75;
+      stroke-width: 2px;
+      paint-order: stroke fill;
       font-size: 13px;
       font-weight: 900;
       pointer-events: none;
@@ -475,7 +479,7 @@ DEMO_HTML = r"""<!doctype html>
     .node .resources {
       font-size: 11px;
       font-weight: 800;
-      fill: #020617;
+      fill: #000000 !important;
     }
     .legend {
       display: flex;
@@ -846,12 +850,22 @@ DEMO_HTML = r"""<!doctype html>
 
       const idText = svgEl('text');
       idText.setAttribute('y', '-8');
+      idText.setAttribute('fill', '#000000');
+      idText.setAttribute('stroke', '#ffffff');
+      idText.setAttribute('stroke-opacity', '0.75');
+      idText.setAttribute('stroke-width', '2');
+      idText.setAttribute('paint-order', 'stroke fill');
       idText.textContent = node.id;
       group.appendChild(idText);
 
       const resText = svgEl('text');
       resText.setAttribute('class', 'resources');
       resText.setAttribute('y', '12');
+      resText.setAttribute('fill', '#000000');
+      resText.setAttribute('stroke', '#ffffff');
+      resText.setAttribute('stroke-opacity', '0.75');
+      resText.setAttribute('stroke-width', '2');
+      resText.setAttribute('paint-order', 'stroke fill');
       resText.textContent = compact(node.resources.join(', '), 18);
       group.appendChild(resText);
 
