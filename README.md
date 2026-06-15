@@ -8,8 +8,6 @@
 
 Projeto em Python para simular buscas por recursos em redes P2P não estruturadas.
 
-O foco da demonstração é permitir que o professor escolha, ao vivo, um nó de origem e um recurso. O sistema mostra visualmente o algoritmo funcionando passo a passo, com quantidade de mensagens, nós buscados, caminho de retorno e comparação de mínimo/máximo por algoritmo.
-
 Relatório completo do funcionamento e atendimento aos requisitos: [RELATORIO.md](RELATORIO.md).
 
 ## Funcionalidades
@@ -65,7 +63,7 @@ http://127.0.0.1:8000
 Na tela:
 
 1. Escolha o nó de origem.
-2. Escolha o recurso que o professor pedir.
+2. Escolha o recurso.
 3. Escolha o algoritmo.
 4. Ajuste o TTL.
 5. Clique em **Executar busca**.
@@ -89,10 +87,6 @@ Na tela:
 - Linha vermelha: mensagem de busca.
 - Linha verde: aviso voltando para a origem.
 - Linha roxa tracejada: pedido direto do recurso ao nó distante.
-
-## Roteiro curto para explicar ao professor
-
-> Cada nó sabe apenas seu ID, seus vizinhos e seus recursos locais. A busca usa os vizinhos para descobrir onde o recurso está. Quando o recurso é encontrado, a resposta volta pelo caminho inverso até a origem. Os nós do caminho aprendem essa localização em cache. Depois disso, a origem pode pedir o recurso diretamente ao nó dono.
 
 ## Outros comandos
 
