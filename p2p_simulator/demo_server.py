@@ -467,15 +467,15 @@ DEMO_HTML = r"""<!doctype html>
     .node text {
       text-anchor: middle;
       dominant-baseline: middle;
-      fill: #0f172a;
+      fill: #020617;
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 900;
       pointer-events: none;
     }
     .node .resources {
-      font-size: 10px;
-      font-weight: 600;
-      fill: #1f2937;
+      font-size: 11px;
+      font-weight: 800;
+      fill: #020617;
     }
     .legend {
       display: flex;
