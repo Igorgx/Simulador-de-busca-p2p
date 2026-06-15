@@ -316,10 +316,10 @@ DEMO_HTML = r"""<!doctype html>
       --query: #ef4444;
       --response: #16a34a;
       --direct: #7c3aed;
-      --origin: #2563eb;
-      --active: #f97316;
+      --origin: #93c5fd;
+      --active: #fdba74;
       --visited: #facc15;
-      --found: #22c55e;
+      --found: #86efac;
       --idle: #e5e7eb;
     }
 
@@ -467,7 +467,7 @@ DEMO_HTML = r"""<!doctype html>
     .node text {
       text-anchor: middle;
       dominant-baseline: middle;
-      fill: #111827;
+      fill: #0f172a;
       font-size: 13px;
       font-weight: 800;
       pointer-events: none;
@@ -475,10 +475,8 @@ DEMO_HTML = r"""<!doctype html>
     .node .resources {
       font-size: 10px;
       font-weight: 600;
-      fill: #374151;
+      fill: #1f2937;
     }
-    .node.origin text, .node.found text, .node.active text { fill: white; }
-    .node.origin .resources, .node.found .resources, .node.active .resources { fill: white; }
     .legend {
       display: flex;
       flex-wrap: wrap;
@@ -609,10 +607,10 @@ DEMO_HTML = r"""<!doctype html>
       <div>
         <input id="timeline" class="timeline" type="range" min="0" max="0" value="0">
         <div class="legend">
-          <span><i style="background:#2563eb"></i>origem</span>
-          <span><i style="background:#f97316"></i>passo atual</span>
+          <span><i style="background:#93c5fd"></i>origem</span>
+          <span><i style="background:#fdba74"></i>passo atual</span>
           <span><i style="background:#facc15"></i>já buscado</span>
-          <span><i style="background:#22c55e"></i>recurso encontrado</span>
+          <span><i style="background:#86efac"></i>recurso encontrado</span>
           <span><i style="background:#ef4444"></i>consulta</span>
           <span><i style="background:#16a34a"></i>aviso de retorno</span>
           <span><i style="background:#7c3aed"></i>pedido direto</span>
