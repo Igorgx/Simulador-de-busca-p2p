@@ -1,6 +1,7 @@
 import pytest
 
 from p2p_simulator.config import load_config, network_from_dict
+from p2p_simulator.demo_server import compare_algorithms_for_resource
 from p2p_simulator.models import ValidationError
 from p2p_simulator.search import run_search
 
@@ -42,3 +43,20 @@ def test_informed_search_uses_cache_after_first_search():
     assert second.found
     assert second.cache_hits >= 1
     assert second.messages <= first.messages
+
+
+def test_resource_comparison_returns_min_and_max_by_algorithm():
+    rows = compare_algorithms_for_resource(
+        "configs/sample.yaml",
+        "r11",
+        4,
+        random_trials=2,
+        seed=7,
+    )
+    assert {row["algorithm"] for row in rows} == {
+        "flooding",
+        "informed_flooding",
+        "random_walk",
+        "informed_random_walk",
+    }
+    assert all("min_messages" in row and "max_nodes" in row for row in rows)

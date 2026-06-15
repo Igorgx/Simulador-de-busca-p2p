@@ -6,6 +6,7 @@ import random
 from pathlib import Path
 
 from .config import load_config
+from .demo_server import run_demo_server
 from .models import SearchResult, ValidationError
 from .search import ALGORITHMS, run_search
 from .visualize import animate_search, draw_comparison_chart, draw_network
@@ -53,6 +54,12 @@ def main() -> None:
         help="Recarrega a rede a cada busca, impedindo aquecimento do cache.",
     )
 
+    demo = subparsers.add_parser("demo", help="Abre a interface visual passo a passo.")
+    demo.add_argument("config")
+    demo.add_argument("--host", default="127.0.0.1")
+    demo.add_argument("--port", type=int, default=8000)
+    demo.add_argument("--no-open", action="store_true", help="Não abre o navegador automaticamente.")
+
     args = parser.parse_args()
 
     try:
@@ -64,6 +71,13 @@ def main() -> None:
             _search(args)
         elif args.command == "compare":
             _compare(args)
+        elif args.command == "demo":
+            run_demo_server(
+                args.config,
+                host=args.host,
+                port=args.port,
+                open_browser=not args.no_open,
+            )
     except ValidationError as exc:
         raise SystemExit(f"Erro de validação: {exc}") from exc
 
