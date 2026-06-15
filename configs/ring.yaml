@@ -3,11 +3,11 @@ min_neighbors: 2
 max_neighbors: 2
 
 resources:
-  n1: [r1, doc]
+  n1: [r1]
   n2: [r2]
   n3: [r3]
   n4: [r4]
-  n5: [r5, alvo]
+  n5: [r5]
   n6: [r6]
   n7: [r7]
   n8: [r8]

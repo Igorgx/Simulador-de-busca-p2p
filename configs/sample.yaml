@@ -3,18 +3,18 @@ min_neighbors: 2
 max_neighbors: 4
 
 resources:
-  n1: [r1, r2, apostila]
-  n2: [r3, musica]
-  n3: [r4, imagem]
-  n4: [r5, video]
-  n5: [r6, artigo]
-  n6: [r7, mapa]
-  n7: [r8, codigo]
-  n8: [r9, dataset]
-  n9: [r10, relatorio]
-  n10: [r11, backup]
-  n11: [r12, chave]
-  n12: [r13, manual]
+  n1: [r1, r2]
+  n2: [r3]
+  n3: [r4]
+  n4: [r5]
+  n5: [r6]
+  n6: [r7]
+  n7: [r8]
+  n8: [r9]
+  n9: [r10]
+  n10: [r11]
+  n11: [r12]
+  n12: [r13]
 
 edges:
   - [n1, n2]
