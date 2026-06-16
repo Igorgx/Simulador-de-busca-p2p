@@ -68,7 +68,7 @@ def draw_network(
 
     legend_text = (
         "Azul: origem | Verde: recurso/cache encontrado | Amarelo: nós envolvidos\n"
-        "Linhas vermelhas: consultas | Verdes: resposta ao nó inicial | Roxa tracejada: pedido direto"
+        "Linhas vermelhas: consultas | Verdes: resposta | Roxa: pedido direto | Azul tracejada: backtracking"
     )
     ax.text(
         0.5,
