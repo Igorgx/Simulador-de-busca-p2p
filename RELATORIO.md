@@ -11,7 +11,7 @@ O sistema permite executar buscas por recursos usando quatro algoritmos:
 - `random_walk`
 - `informed_random_walk`
 
-Além da execução textual pelo terminal, o sistema possui uma interface visual no navegador para demonstrar o funcionamento passo a passo, permitindo que o professor escolha o nó de origem, o recurso, o TTL e o algoritmo durante a apresentação.
+Além da execução textual pelo terminal, o sistema possui uma interface visual no navegador para demonstrar o funcionamento passo a passo, permitindo que escolha o nó de origem, o recurso, o TTL e o algoritmo durante a apresentação.
 
 ## 2. Organização principal do código
 
@@ -448,7 +448,7 @@ Rastro visual:
 python main.py demo configs/sample.yaml
 ```
 
-Na interface visual, o professor pode controlar:
+Na interface visual, o usuário pode controlar:
 
 - próximo passo;
 - passo anterior;
@@ -527,7 +527,7 @@ O comando gera:
 
 ## 7. Interface visual de demonstração
 
-A interface visual foi criada para responder diretamente ao que o professor pode pedir durante a apresentação.
+A interface visual foi criada para responder diretamente ao que o usuário pode pedir durante a apresentação.
 
 Comando:
 
@@ -574,7 +574,7 @@ O random walk escolhe um vizinho aleatoriamente. Portanto, se a busca for execut
 Isso é útil para apresentação porque:
 
 - torna a demonstração reprodutível;
-- permite repetir o mesmo caminho caso o professor peça;
+- permite repetir o mesmo caminho caso o usuário peça;
 - facilita comparar resultados.
 
 O valor da seed não tem significado especial. O padrão `42` poderia ser substituído por `1`, `10`, `1234` etc. O importante é que a mesma seed gera a mesma sequência de escolhas aleatórias.
@@ -656,7 +656,7 @@ python main.py validate configs/sample.yaml
 python main.py demo configs/sample.yaml
 ```
 
-4. Pedir ao professor para escolher:
+4. Pedir ao usuário para escolher:
    - nó de origem;
    - recurso;
    - TTL;
