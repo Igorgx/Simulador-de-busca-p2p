@@ -316,6 +316,7 @@ DEMO_HTML = r"""<!doctype html>
       --query: #ef4444;
       --response: #16a34a;
       --direct: #7c3aed;
+      --backtrack: #0284c7;
       --origin: #93c5fd;
       --active: #fdba74;
       --visited: #facc15;
@@ -455,6 +456,7 @@ DEMO_HTML = r"""<!doctype html>
     .edge.query { stroke: var(--query); stroke-width: 5; }
     .edge.response { stroke: var(--response); stroke-width: 5; }
     .edge.direct { stroke: var(--direct); stroke-width: 4; stroke-dasharray: 9 7; }
+    .edge.backtrack { stroke: var(--backtrack); stroke-width: 4; stroke-dasharray: 5 6; }
     .node circle {
       stroke: #111827;
       stroke-width: 2;
@@ -618,6 +620,7 @@ DEMO_HTML = r"""<!doctype html>
           <span><i style="background:#ef4444"></i>consulta</span>
           <span><i style="background:#16a34a"></i>aviso de retorno</span>
           <span><i style="background:#7c3aed"></i>pedido direto</span>
+          <span><i style="background:#0284c7"></i>backtracking</span>
         </div>
       </div>
     </section>
@@ -758,7 +761,7 @@ DEMO_HTML = r"""<!doctype html>
       if (!state.result) return;
       const event = currentEvent();
       const past = eventsUntilStep();
-      const messageCount = past.filter(e => ['query', 'response', 'direct_request', 'direct_response'].includes(e.event_type)).length;
+      const messageCount = past.filter(e => ['query', 'response', 'backtrack', 'direct_request', 'direct_response'].includes(e.event_type)).length;
       const visited = new Set(past.filter(e => e.event_type === 'visit').map(e => e.node_id));
 
       $('searchId').textContent = state.result.search_id;
@@ -811,6 +814,7 @@ DEMO_HTML = r"""<!doctype html>
         if (event.from_node && event.to_node) {
           let cls = 'edge query';
           if (event.event_type === 'response') cls = 'edge response';
+          if (event.event_type === 'backtrack') cls = 'edge backtrack';
           if (['direct_request', 'direct_response'].includes(event.event_type)) cls = 'edge direct';
           edgeLayer.appendChild(drawEdge(event.from_node, event.to_node, cls));
         }
@@ -895,8 +899,12 @@ DEMO_HTML = r"""<!doctype html>
         query: 'mensagem de busca',
         response: 'aviso de retorno',
         found: 'recurso encontrado',
+        found_again: 'recurso confirmado',
         cache_hit: 'cache encontrou',
         cache_update: 'cache atualizado',
+        parallel_continue: 'inundação paralela continua',
+        backtrack: 'backtracking',
+        ttl_backtrack: 'TTL 0 com backtracking',
         ttl_expired: 'TTL acabou',
         duplicate: 'duplicata ignorada',
         not_found: 'não encontrado',

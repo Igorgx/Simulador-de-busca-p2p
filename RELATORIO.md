@@ -256,18 +256,27 @@ Funcionamento:
 - Se não possuir, retransmite para seus vizinhos enquanto houver TTL.
 - Duplicatas são ignoradas para evitar processamento repetido.
 - Quando o recurso é encontrado, a resposta volta pelo caminho inverso.
+- A inundação continua processando os outros ramos que já estavam em andamento.
+
+Esse último ponto simula o paralelismo pedido pelo professor: mesmo que um ramo encontre o recurso, os outros nós ainda não receberam essa informação globalmente. Portanto, eles continuam tentando encontrar o recurso até que suas mensagens terminem ou o TTL impeça novas retransmissões.
+
+Na interface visual, isso aparece depois do evento `parallel_continue`: o nó que encontrou o recurso fica marcado, mas a animação continua mostrando outros nós recebendo e propagando mensagens.
 
 Esse algoritmo tende a encontrar o recurso com maior probabilidade, mas gera mais mensagens.
 
-### 5.4 Busca por passeio aleatório
+### 5.4 Busca por passeio aleatório com backtracking
 
 Funcionamento:
 
 - O nó atual escolhe apenas um vizinho aleatoriamente.
 - A busca segue por esse vizinho.
-- O processo se repete até encontrar o recurso ou o TTL acabar.
+- Se o caminho não encontrar o recurso ou chegar a um ramo sem avanço útil, a busca volta para o nó anterior.
+- Depois de voltar, o algoritmo tenta outro vizinho disponível.
+- Mesmo quando o envio para esse outro vizinho ocorre com TTL 0, o backtracking permite essa tentativa porque a busca está retornando para explorar uma alternativa já alcançada anteriormente.
 
-Esse algoritmo gera menos mensagens que o flooding, mas pode falhar dependendo do caminho escolhido.
+Esse comportamento foi adicionado para atender ao pedido do professor. Na interface visual, as voltas aparecem como linhas azuis tracejadas e eventos chamados `backtrack`.
+
+Esse algoritmo ainda gera menos mensagens que o flooding em muitos casos, mas agora consegue explorar alternativas em vez de simplesmente morrer no primeiro caminho ruim.
 
 ### 5.5 Busca informada com cache
 
@@ -554,6 +563,7 @@ Elementos visuais:
 - linha vermelha: mensagem de busca;
 - linha verde: aviso de retorno;
 - linha roxa tracejada: pedido direto do recurso.
+- linha azul tracejada: backtracking do random walk.
 
 ## 8. Sobre a seed do random walk
 

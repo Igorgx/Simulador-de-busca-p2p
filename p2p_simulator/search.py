@@ -76,12 +76,12 @@ def run_search(
 ) -> SearchResult:
     if algorithm not in ALGORITHMS:
         raise ValidationError(
-            f"Algoritmo inválido: {algorithm}. Use um destes: {', '.join(sorted(ALGORITHMS))}."
+            f"Algoritmo invalido: {algorithm}. Use um destes: {', '.join(sorted(ALGORITHMS))}."
         )
     if origin not in network.nodes:
-        raise ValidationError(f"Nó de origem inexistente: {origin}.")
+        raise ValidationError(f"No de origem inexistente: {origin}.")
     if ttl < 0:
-        raise ValidationError("ttl não pode ser negativo.")
+        raise ValidationError("ttl nao pode ser negativo.")
 
     state = _RunState(
         search_id=search_id or uuid.uuid4().hex[:8],
@@ -105,7 +105,7 @@ def run_search(
     if algorithm.endswith("flooding"):
         _run_flooding(network, state)
     else:
-        _run_random_walk(network, state, rng)
+        _run_random_walk_with_backtracking(network, state, rng)
 
     direct_messages = 0
     if direct_get and state.holder and state.holder != origin:
@@ -164,13 +164,31 @@ def _check_current_node(
     )
 
     if node.has_resource(state.resource_id):
-        _mark_found(network, state, current, path, "resource")
+        if state.holder is None:
+            _mark_found(network, state, current, path, "resource")
+        else:
+            state.event(
+                "found_again",
+                current,
+                f"{current} tambem recebeu a busca e confirmou {state.resource_id} localmente, mas a origem ja tinha sido avisada.",
+                ttl=ttl,
+                path=path,
+            )
         return True
 
     if state.informed and state.resource_id in node.cache:
         state.cache_hits += 1
         holder = node.cache[state.resource_id]
-        _mark_found(network, state, holder, path, "cache", cache_node=current)
+        if state.holder is None:
+            _mark_found(network, state, holder, path, "cache", cache_node=current)
+        else:
+            state.event(
+                "cache_hit",
+                current,
+                f"{current} tambem encontrou no cache que {state.resource_id} esta em {holder}; a busca paralela continua nos outros ramos.",
+                ttl=ttl,
+                path=path,
+            )
         return True
 
     return False
@@ -193,7 +211,7 @@ def _mark_found(
         state.event(
             "cache_hit",
             cache_node,
-            f"{cache_node} já sabia pelo cache que {resource_id_label(state)} está em {holder}.",
+            f"{cache_node} ja sabia pelo cache que {state.resource_id} esta em {holder}.",
             ttl=0,
             path=path,
         )
@@ -201,7 +219,7 @@ def _mark_found(
         state.event(
             "found",
             holder,
-            f"{holder} possui localmente {resource_id_label(state)}.",
+            f"{holder} possui localmente {state.resource_id}.",
             ttl=0,
             path=path,
         )
@@ -223,7 +241,7 @@ def _mark_found(
     state.event(
         "cache_update",
         holder,
-        f"Nós no caminho agora cacheiam {state.resource_id} -> {holder}: {', '.join(path)}.",
+        f"Nos no caminho agora cacheiam {state.resource_id} -> {holder}: {', '.join(path)}.",
         path=path,
     )
 
@@ -239,7 +257,7 @@ def _run_flooding(network: P2PNetwork, state: _RunState) -> None:
     queue: deque[tuple[str, str, int, list[str]]] = deque()
 
     if state.ttl == 0:
-        state.event("ttl_expired", state.origin, "TTL inicial é 0; a busca não sai da origem.", ttl=0)
+        state.event("ttl_expired", state.origin, "TTL inicial e 0; a busca nao sai da origem.", ttl=0)
         return
 
     for neighbor in sorted(network.get(state.origin).neighbors):
@@ -255,7 +273,7 @@ def _run_flooding(network: P2PNetwork, state: _RunState) -> None:
         )
         queue.append((state.origin, neighbor, state.ttl - 1, [state.origin, neighbor]))
 
-    while queue and state.holder is None:
+    while queue:
         previous, current, ttl, path = queue.popleft()
         if current in processed:
             state.event(
@@ -271,13 +289,21 @@ def _run_flooding(network: P2PNetwork, state: _RunState) -> None:
 
         processed.add(current)
         if _check_current_node(network, state, current, path, ttl):
-            return
+            if queue:
+                state.event(
+                    "parallel_continue",
+                    current,
+                    "Este ramo encontrou o recurso, mas outras mensagens de inundacao ja estavam em paralelo e continuam sendo processadas.",
+                    ttl=ttl,
+                    path=path,
+                )
+            continue
 
         if ttl == 0:
             state.event(
                 "ttl_expired",
                 current,
-                f"{current} não retransmite porque o TTL chegou a 0.",
+                f"{current} nao retransmite porque o TTL chegou a 0.",
                 ttl=ttl,
                 path=path,
             )
@@ -303,60 +329,94 @@ def _run_flooding(network: P2PNetwork, state: _RunState) -> None:
         state.event(
             "not_found",
             state.origin,
-            f"{state.resource_id} não foi encontrado antes da fila esvaziar.",
+            f"{state.resource_id} nao foi encontrado antes da fila esvaziar.",
             ttl=0,
         )
 
 
-def _run_random_walk(network: P2PNetwork, state: _RunState, rng: random.Random) -> None:
-    current = state.origin
-    previous: str | None = None
-    ttl = state.ttl
-    path = [current]
+def _run_random_walk_with_backtracking(
+    network: P2PNetwork,
+    state: _RunState,
+    rng: random.Random,
+) -> None:
+    path = [state.origin]
+    ttl_stack = [state.ttl]
+    tried_edges: set[tuple[str, str]] = set()
+    visited_for_choice = {state.origin}
+    ttl_zero_backtrack_allowed: set[str] = set()
 
-    if _check_current_node(network, state, current, path, ttl):
+    if _check_current_node(network, state, state.origin, path, state.ttl):
         return
 
-    while ttl > 0 and state.holder is None:
-        neighbors = sorted(network.get(current).neighbors)
-        candidates = [neighbor for neighbor in neighbors if neighbor != previous] or neighbors
-        if not candidates:
+    while path and state.holder is None:
+        current = path[-1]
+        ttl = ttl_stack[-1]
+        candidates = [
+            neighbor
+            for neighbor in sorted(network.get(current).neighbors)
+            if (current, neighbor) not in tried_edges and neighbor not in visited_for_choice
+        ]
+
+        can_move = ttl > 0 or current in ttl_zero_backtrack_allowed
+        if candidates and can_move:
+            if ttl == 0:
+                ttl_zero_backtrack_allowed.discard(current)
+            next_node = rng.choice(candidates)
+            tried_edges.add((current, next_node))
+            tried_edges.add((next_node, current))
+            visited_for_choice.add(next_node)
+            next_ttl = max(ttl - 1, 0)
+            next_path = [*path, next_node]
+            state.messages += 1
             state.event(
-                "dead_end",
-                current,
-                f"{current} não possui vizinhos para continuar o passeio aleatório.",
-                ttl=ttl,
-                path=path,
+                "query",
+                next_node,
+                f"{current} escolhe aleatoriamente {next_node}; TTL enviado={next_ttl}.",
+                from_node=current,
+                to_node=next_node,
+                ttl=next_ttl,
+                path=next_path,
             )
+            path.append(next_node)
+            ttl_stack.append(next_ttl)
+
+            if _check_current_node(network, state, next_node, next_path, next_ttl):
+                return
+            continue
+
+        if len(path) == 1:
             break
 
-        next_node = rng.choice(candidates)
-        ttl -= 1
+        backtracked_from = path.pop()
+        ttl_stack.pop()
+        previous = path[-1]
+        previous_ttl = ttl_stack[-1]
         state.messages += 1
         state.event(
-            "query",
-            next_node,
-            f"{current} escolhe aleatoriamente {next_node}; TTL enviado={ttl}.",
-            from_node=current,
-            to_node=next_node,
-            ttl=ttl,
-            path=[*path, next_node],
+            "backtrack",
+            previous,
+            f"{backtracked_from} nao encontrou {state.resource_id} ou esgotou o TTL do ramo; volta para {previous} para tentar outro vizinho disponivel.",
+            from_node=backtracked_from,
+            to_node=previous,
+            ttl=previous_ttl,
+            path=path,
         )
-        previous, current = current, next_node
-        path.append(current)
 
-        if _check_current_node(network, state, current, path, ttl):
-            return
+        if previous_ttl == 0:
+            ttl_zero_backtrack_allowed.add(previous)
+            state.event(
+                "ttl_backtrack",
+                previous,
+                f"Mesmo com TTL 0 em {previous}, o backtracking permite escolher outro vizinho ainda nao tentado.",
+                ttl=previous_ttl,
+                path=path,
+            )
 
     if state.holder is None:
         state.event(
             "not_found",
             state.origin,
-            f"{state.resource_id} não foi encontrado antes do TTL acabar.",
-            ttl=ttl,
+            f"{state.resource_id} nao foi encontrado depois de tentar os caminhos disponiveis com random walk e backtracking.",
+            ttl=ttl_stack[-1] if ttl_stack else 0,
             path=path,
         )
-
-
-def resource_id_label(state: _RunState) -> str:
-    return state.resource_id

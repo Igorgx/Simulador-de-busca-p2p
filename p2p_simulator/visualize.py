@@ -120,6 +120,8 @@ def animate_search(
             if prior.from_node and prior.to_node:
                 if prior.event_type in {"direct_request", "direct_response"}:
                     color = "#8b5cf6"
+                elif prior.event_type == "backtrack":
+                    color = "#0284c7"
                 elif prior.event_type == "response":
                     color = "#22c55e"
                 else:
@@ -148,7 +150,7 @@ def animate_search(
                 edgelist=[(left, right)],
                 edge_color=color,
                 width=3.0,
-                style="dashed" if color == "#8b5cf6" else "solid",
+                style="dashed" if color in {"#8b5cf6", "#0284c7"} else "solid",
             )
 
         labels = {
@@ -212,6 +214,7 @@ def _draw_event_edges(graph: nx.Graph, pos: dict[str, tuple[float, float]], ax, 
     query_edges = []
     response_edges = []
     direct_edges = []
+    backtrack_edges = []
     for event in events:
         if not event.from_node or not event.to_node:
             continue
@@ -222,6 +225,8 @@ def _draw_event_edges(graph: nx.Graph, pos: dict[str, tuple[float, float]], ax, 
             response_edges.append(edge)
         elif event.event_type in {"direct_request", "direct_response"}:
             direct_edges.append(edge)
+        elif event.event_type == "backtrack" and graph.has_edge(*edge):
+            backtrack_edges.append(edge)
 
     if query_edges:
         nx.draw_networkx_edges(graph, pos, ax=ax, edgelist=query_edges, edge_color="#ef4444", width=2.5)
@@ -237,6 +242,16 @@ def _draw_event_edges(graph: nx.Graph, pos: dict[str, tuple[float, float]], ax, 
             width=2.5,
             style="dashed",
             arrows=True,
+        )
+    if backtrack_edges:
+        nx.draw_networkx_edges(
+            graph,
+            pos,
+            ax=ax,
+            edgelist=backtrack_edges,
+            edge_color="#0284c7",
+            width=2.5,
+            style="dashed",
         )
 
 
@@ -256,6 +271,10 @@ _VISIBLE_EVENT_TYPES = {
     "visit",
     "found",
     "cache_hit",
+    "parallel_continue",
+    "found_again",
+    "backtrack",
+    "ttl_backtrack",
     "response",
     "direct_request",
     "direct_response",

@@ -20,8 +20,8 @@ Relatório completo do funcionamento e atendimento aos requisitos: [RELATORIO.md
   - sem arestas de um nó para ele mesmo.
 - Cada nó conhece apenas seu ID, seus vizinhos, seus recursos locais e seu cache.
 - Algoritmos:
-  - `flooding`;
-  - `random_walk`;
+  - `flooding`, com continuação dos outros ramos para simular inundação paralela;
+  - `random_walk`, com backtracking para voltar e tentar outro vizinho;
   - `informed_flooding`;
   - `informed_random_walk`.
 - TTL em todas as buscas.
@@ -87,6 +87,7 @@ Na tela:
 - Linha vermelha: mensagem de busca.
 - Linha verde: aviso voltando para a origem.
 - Linha roxa tracejada: pedido direto do recurso ao nó distante.
+- Linha azul tracejada: backtracking do random walk.
 
 ## Outros comandos
 

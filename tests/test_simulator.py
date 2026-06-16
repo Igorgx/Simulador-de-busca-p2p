@@ -31,8 +31,21 @@ def test_flooding_finds_resource_and_records_stats():
     assert result.found
     assert result.holder == "n10"
     assert result.messages > 0
-    assert result.visited_count > 1
+    assert result.visited_count == len(network.nodes)
     assert result.search_id
+    assert any(event.event_type == "parallel_continue" for event in result.events)
+
+
+def test_random_walk_uses_backtracking_to_try_other_neighbors():
+    network = load_config("configs/sample.yaml")
+    result = run_search(network, "n1", "r11", 3, "random_walk", seed=42, direct_get=False)
+    assert result.found
+    assert result.holder == "n10"
+    assert any(event.event_type == "backtrack" for event in result.events)
+    assert any(
+        event.event_type == "query" and event.ttl == 0
+        for event in result.events
+    )
 
 
 def test_informed_search_uses_cache_after_first_search():
