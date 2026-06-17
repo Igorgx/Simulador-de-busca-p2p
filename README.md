@@ -301,6 +301,14 @@ Nós envolvidos: 8
 Caminho de aviso: n10 -> n6 -> n3 -> n1
 ```
 
+## Exemplo do sistema funcional
+
+### Exemplo do sistema quando não encontra recurso 
+<img width="1864" height="893" alt="image" src="https://github.com/user-attachments/assets/96241624-ffa2-469e-ba3d-0b4a117fc089" />
+
+### Exemplo do sistema quando o recurso é encontrado
+<img width="1874" height="898" alt="image" src="https://github.com/user-attachments/assets/8228fbd5-a14c-45e8-a467-a21797acdcaa" />
+
 ## 9. Buscas informadas com cache
 
 As versões informadas são:
