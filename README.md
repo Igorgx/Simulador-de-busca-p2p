@@ -435,18 +435,6 @@ Pela interface visual:
 2. escolha um TTL;
 3. clique em **Calcular min/máx do recurso**.
 
-## 14. Seed do random walk
-
-A seed controla a sequência pseudoaleatória usada pelo random walk.
-
-Ela é útil porque:
-
-- torna a demonstração reproduzível;
-- permite repetir o mesmo caminho durante a apresentação;
-- facilita comparar resultados.
-
-O valor da seed não tem significado especial. O padrão `42` pode ser trocado por outro número. Se a seed mudar, o passeio aleatório pode escolher outro caminho.
-
 ## 15. Estrutura do projeto
 
 ```text
